@@ -9,54 +9,36 @@ using System.Windows.Shapes;
 
 namespace WpfWaveform
 {
-    class Peak
-    {
-        public double LeftMin  { get; private set; }
-        public double LeftMax  { get; private set; }
-        public double RightMin { get; private set; }
-        public double RightMax { get; private set; }
-
-        public Peak(double leftMin, double leftMax, double rightMin, double rightMax)
-        {
-            this.LeftMin  = leftMin;
-            this.LeftMax  = leftMax;
-            this.RightMin = rightMin;
-            this.RightMax = rightMax;
-        }
-    }
-
     class WaveFormPointsGenerator
     {
-        public IEnumerable<Peak> GetPeaks(string fileName, int millisecondsPerUpdate)
+        public MipMap GetPeaks(string fileName, int samplesPerPeak)
         {
-            List<Peak> peaks = new List<Peak>();
-            peaks.Add(new Peak(0,0,0,0));
+            MipMap m = new MipMap();
+            m.DivisionFactor = samplesPerPeak;
+            
+            List<PeakValues> peaks = new List<PeakValues>();
             using (var reader = new Mp3FileReader(fileName))
             {
-                int stepSize = (reader.WaveFormat.AverageBytesPerSecond / 1000) * millisecondsPerUpdate;
+                int channels = reader.WaveFormat.Channels;
+                int stepSize = samplesPerPeak * channels * (reader.WaveFormat.BitsPerSample / 8);
                 WaveBuffer buffer = new WaveBuffer(stepSize);
                 int read;
                 while ((read = reader.Read(buffer.ByteBuffer, 0, stepSize)) > 0)
                 {
+                    PeakValues peakValues = new PeakValues(reader.WaveFormat.Channels);
                     int samples = read / 2; // assume 16 bit
-                    double maxLeft = 0;
-                    double minLeft = 0;
-                    double maxRight = 0;
-                    double minRight = 0;
-                    for (int sample = 0; sample < samples; sample += 2)
+                    
+                    for (int index = 0; index < samples; index++)
                     {
-                        double sampleLeft = buffer.ShortBuffer[sample] / 32768.0;
-                        maxLeft = Math.Max(maxLeft, sampleLeft);
-                        minLeft = Math.Min(minLeft, sampleLeft);
-                        double sampleRight = buffer.ShortBuffer[sample + 1] / 32768.0;
-                        maxRight = Math.Max(maxRight, sampleLeft);
-                        minRight = Math.Min(minRight, sampleLeft);
+                        int ch = index % channels;
+                        peakValues.Channels[ch].Max = Math.Max(peakValues.Channels[ch].Max, buffer.ShortBuffer[index]);
+                        peakValues.Channels[ch].Min = Math.Min(peakValues.Channels[ch].Min, buffer.ShortBuffer[index]);
                     }
-                    peaks.Add(new Peak(minLeft, maxLeft, minRight, maxRight));
+                    peaks.Add(peakValues);
                 }
             }
-            peaks.Add(new Peak(0,0,0,0));
-            return peaks;
+            m.Peaks = peaks.ToArray();
+            return m;
         }
 
         public Path GetBezierPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
@@ -78,11 +60,13 @@ namespace WpfWaveform
         private IEnumerable<Point> GetPoints(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult)
         {
             List<Point> points = new List<Point>();
+            points.Add(new Point(xOffset, yOffset)); xOffset += xStep; // extra zero point at beginning
             foreach (var m in magnitude)
             {
                 points.Add(new Point(xOffset, yOffset + m * yMult));
                 xOffset += xStep;
             }
+            points.Add(new Point(xOffset, yOffset)); xOffset += xStep; // extra zero point at end
             return points;
         }
 

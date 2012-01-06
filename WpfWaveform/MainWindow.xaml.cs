@@ -29,10 +29,10 @@ namespace WpfWaveform
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var generator = new WaveFormPointsGenerator();
-            var peaks = generator.GetPeaks(@"E:\Audio\Music\Coldplay\X&Y\04-Fix You.mp3", 100);
+            var mipMap = generator.GetPeaks(@"E:\Audio\Music\Coldplay\X&Y\04-Fix You.mp3", 4100);
             var strokeBrush = new SolidColorBrush(Color.FromRgb(0xC1, 0xC1, 0x93));
-            canvas.Children.Add(generator.GetBezierPath(peaks.Select(p => p.LeftMax), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
-            canvas.Children.Add(generator.GetBezierPath(peaks.Select(p => p.LeftMin), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
+            canvas.Children.Add(generator.GetBezierPath(mipMap.Peaks.Select(p => p.Channels[0].Max / 32768.0), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
+            canvas.Children.Add(generator.GetBezierPath(mipMap.Peaks.Select(p => p.Channels[0].Min / 32768.0), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
         }
 
     }
