@@ -36,11 +36,13 @@ namespace WpfWaveform
         private string magicHeader;
         private int channels;
         private int sampleRate;
-        private List<MipMap> mipMaps;
+
+        public MipMap[] MipMaps { get; private set; }
 
         // http://www.reaper.fm/sdk/reapeaks.txt
         public ReaPeaksFileReader(string filename)
         {
+            var mipMaps = new List<MipMap>();
             using (BinaryReader reader = new BinaryReader(File.OpenRead(filename)))
             {
                 this.magicHeader = Encoding.ASCII.GetString(reader.ReadBytes(4));
@@ -55,9 +57,10 @@ namespace WpfWaveform
                 int sourceFilesize = reader.ReadInt32();
                 for (int mipMap = 0; mipMap < mipMapCount; mipMap++)
                 {
-                    this.mipMaps.Add(ReadMipMap(reader));
+                    mipMaps.Add(ReadMipMap(reader));
                 }
             }
+            this.MipMaps = mipMaps.ToArray();
         }
 
         private MipMap ReadMipMap(BinaryReader reader)

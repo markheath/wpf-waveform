@@ -4,7 +4,14 @@
         xmlns:local="clr-namespace:WpfWaveform"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Border BorderBrush="LightBlue" BorderThickness="5" Margin="0,5,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="282*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="5">
+            <Button Content="Load" Width="80" Click="Button_Click" />
+        </StackPanel>
+        <Border BorderBrush="LightBlue" BorderThickness="5" Grid.Row="1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <local:AutoSizeCanvas x:Name="canvas" Background="Transparent"/>
             </ScrollViewer>
