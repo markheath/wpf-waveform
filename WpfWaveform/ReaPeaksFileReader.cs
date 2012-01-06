@@ -57,19 +57,28 @@ namespace WpfWaveform
                 int sourceFilesize = reader.ReadInt32();
                 for (int mipMap = 0; mipMap < mipMapCount; mipMap++)
                 {
-                    mipMaps.Add(ReadMipMap(reader));
+                    mipMaps.Add(ReadMipMapHeader(reader));
+                }
+                for (int mipMap = 0; mipMap < mipMapCount; mipMap++)
+                {
+                    ReadMipMapData(reader, mipMaps[mipMap]);
                 }
             }
             this.MipMaps = mipMaps.ToArray();
         }
 
-        private MipMap ReadMipMap(BinaryReader reader)
+        private MipMap ReadMipMapHeader(BinaryReader reader)
         {
             var mipMap = new MipMap();
             mipMap.DivisionFactor = reader.ReadInt32(); // number of samples per peak
             int numberOfPeakSamples = reader.ReadInt32();
             mipMap.Peaks = new PeakValues[numberOfPeakSamples];
-            for (int n = 0; n < numberOfPeakSamples; n++)
+            return mipMap;
+        }
+
+        private void ReadMipMapData(BinaryReader reader, MipMap mipMap)
+        {
+            for (int n = 0; n < mipMap.Peaks.Length; n++)
             {
                 mipMap.Peaks[n] = new PeakValues(channels);
                 for (int ch = 0; ch < channels; ch++)
@@ -81,11 +90,10 @@ namespace WpfWaveform
                     }
                     else // 1.0
                     {
-                        mipMap.Peaks[n].Channels[ch].Min = mipMap.Peaks[n].Channels[ch].Max;
+                        mipMap.Peaks[n].Channels[ch].Min = (short)(0 - mipMap.Peaks[n].Channels[ch].Max);
                     }
                 }
             }
-            return mipMap;
         }
     }
 }

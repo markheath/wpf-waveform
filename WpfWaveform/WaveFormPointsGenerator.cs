@@ -13,11 +13,17 @@ namespace WpfWaveform
     {
         public MipMap GetPeaks(string fileName, int samplesPerPeak)
         {
+            if (fileName.EndsWith(".ReaPeaks", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var reaPeaks = new ReaPeaksFileReader(fileName);
+                return reaPeaks.MipMaps[0];
+            }
+
             MipMap m = new MipMap();
             m.DivisionFactor = samplesPerPeak;
-            
+
             List<PeakValues> peaks = new List<PeakValues>();
-            using (var reader = new Mp3FileReader(fileName))
+            using (var reader = GetReader(fileName))
             {
                 int channels = reader.WaveFormat.Channels;
                 int stepSize = samplesPerPeak * channels * (reader.WaveFormat.BitsPerSample / 8);
@@ -39,6 +45,22 @@ namespace WpfWaveform
             }
             m.Peaks = peaks.ToArray();
             return m;
+        }
+
+        private WaveStream GetReader(string fileName)
+        {
+            if (fileName.EndsWith(".mp3", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return new Mp3FileReader(fileName);
+            }
+            else if (fileName.EndsWith(".wav", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return new WaveFileReader(fileName);
+            }
+            else
+            {
+                throw new ArgumentException("Unsupported file type");
+            }
         }
 
         public Path GetBezierPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
