@@ -5,6 +5,7 @@ using System.Text;
 using NAudio.Wave;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace WpfWaveform
 {
@@ -58,7 +59,23 @@ namespace WpfWaveform
             return peaks;
         }
 
-        public IEnumerable<Point> GetPoints(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult)
+        public Path GetBezierPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
+        {
+            var points = GetPoints(magnitude, 0, 2, 110, -100).ToArray();
+            var geometry = GetBezierPathGeometry(points);
+            var path = new Path() { Stroke = stroke, StrokeThickness = 1, Data = geometry, Fill = fill };
+            return path;
+        }
+
+        public Path GetLinearPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
+        {
+            var points = GetPoints(magnitude, 0, 2, 110, -100).ToArray();
+            var geometry = GetLinearPathGeometry(points);
+            var path = new Path() { Stroke = stroke, StrokeThickness = 1, Data = geometry, Fill = fill };
+            return path;
+        }
+
+        private IEnumerable<Point> GetPoints(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult)
         {
             List<Point> points = new List<Point>();
             foreach (var m in magnitude)
@@ -69,7 +86,7 @@ namespace WpfWaveform
             return points;
         }
 
-        public PathGeometry GetBezierPathGeometry(Point[] points)
+        private PathGeometry GetBezierPathGeometry(Point[] points)
         {
             // Get Bezier Spline Control Points.
             Point[] cp1, cp2;
@@ -81,6 +98,16 @@ namespace WpfWaveform
             {
                 lines.Add(new BezierSegment(cp1[i], cp2[i], points[i + 1], true));
             }
+            PathFigure f = new PathFigure(points[0], lines, false);
+            PathGeometry g = new PathGeometry(new PathFigure[] { f });
+            return g;
+        }
+
+        private PathGeometry GetLinearPathGeometry(Point[] points)
+        {
+            // Draw curve by Bezier.
+            PathSegmentCollection lines = new PathSegmentCollection();
+            lines.Add(new PolyLineSegment(points, true));
             PathFigure f = new PathFigure(points[0], lines, false);
             PathGeometry g = new PathGeometry(new PathFigure[] { f });
             return g;
