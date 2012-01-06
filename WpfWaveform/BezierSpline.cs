@@ -136,7 +136,7 @@ namespace WpfWaveform
         /// <param name="firstControlPoints">Output First Control points array of knots.Length - 1 length.</param>
         /// <param name="secondControlPoints">Output Second Control points array of knots.Length - 1 length.</param>
         /// <exception cref="ArgumentNullException"><paramref name="knots"/> parameter must be not null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="knots"/> array must containg at least two points.</exception>
+        /// <exception cref="ArgumentException"><paramref name="knots"/> array must contain at least two points.</exception>
         public static void GetCurveControlPoints(Point[] knots, out Point[] firstControlPoints, out Point[] secondControlPoints)
         {
             if (knots == null)

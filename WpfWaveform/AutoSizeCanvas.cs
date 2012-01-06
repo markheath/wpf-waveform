@@ -17,12 +17,17 @@ namespace WpfWaveform
             foreach (var child in Children.OfType<FrameworkElement>())
             {
                 child.Measure(availableSize);
-                double x = x = GetLeft(child) + child.DesiredSize.Width; 
+                double left = GetLeft(child);
+                if (double.IsNaN(left)) left = 0;
+                double x = left + child.DesiredSize.Width; 
                 if (!double.IsInfinity(x) && !double.IsNaN(x))
                 {
                     width = Math.Max(width, x);
                 }
-                double y = GetTop(child) + child.DesiredSize.Height;
+                double top = GetTop(child);
+                if (double.IsNaN(top)) top = 0;
+
+                double y = top + child.DesiredSize.Height;
                 if (!double.IsInfinity(y) && !double.IsNaN(y))
                 {
                     height = Math.Max(height, y);
