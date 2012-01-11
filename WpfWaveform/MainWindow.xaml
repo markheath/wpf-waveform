@@ -2,6 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:WpfWaveform"
+        xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit"
+        xmlns:toolkitx="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Grid.RowDefinitions>
@@ -10,6 +12,12 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Margin="5">
             <Button Content="Load" Width="80" Click="Button_Click" />
+            <CheckBox VerticalAlignment="Center" Margin="5,0" Content="Outline" Height="16" Name="checkBoxOutline" />
+            <CheckBox VerticalAlignment="Center" Margin="5,0" Content="Bezier" Height="16" Name="checkBoxBezier" />
+            <Label VerticalAlignment="Center">Fill:</Label>
+            <toolkitx:ColorPicker Name="colorPickerFill" />
+            <Label VerticalAlignment="Center">Outline:</Label>
+            <toolkitx:ColorPicker Name="colorPickerOutline" />
         </StackPanel>
         <Border BorderBrush="LightBlue" BorderThickness="5" Grid.Row="1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">

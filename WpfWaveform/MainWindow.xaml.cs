@@ -25,6 +25,9 @@ namespace WpfWaveform
         {
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
+            this.checkBoxBezier.IsChecked = true;
+            this.colorPickerFill.SelectedColor = Colors.LightGray;
+            this.colorPickerOutline.SelectedColor = Colors.SlateGray;
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -47,10 +50,17 @@ namespace WpfWaveform
         {
             var generator = new WaveFormPointsGenerator();
             var mipMap = generator.GetPeaks(fileName, 4100);
-            var strokeBrush = new SolidColorBrush(Color.FromRgb(0xC1, 0xC1, 0x93));
+            Brush strokeBrush = (checkBoxOutline.IsChecked.Value) ? new SolidColorBrush(colorPickerOutline.SelectedColor) : null;
+            Brush fillBrush = new SolidColorBrush(colorPickerFill.SelectedColor);
             canvas.Children.Clear();
-            canvas.Children.Add(generator.GetBezierPath(mipMap.Peaks.Select(p => p.Channels[0].Max / 32768.0), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
-            canvas.Children.Add(generator.GetBezierPath(mipMap.Peaks.Select(p => p.Channels[0].Min / 32768.0), 0, 2, 110, -100, strokeBrush, Brushes.Beige));
+
+            var topPoints = mipMap.Peaks.Select(p => p.Channels[0].Max / 32768.0);
+            var bottomPoints = mipMap.Peaks.Select(p => p.Channels[0].Min / 32768.0);
+
+            var topPath = checkBoxBezier.IsChecked.Value ? generator.GetBezierPath(topPoints, 0, 2, 110, -100, strokeBrush, fillBrush) : generator.GetLinearPath(topPoints, 0, 2, 110, -100, strokeBrush, fillBrush);
+            var bottomPath = checkBoxBezier.IsChecked.Value ? generator.GetBezierPath(bottomPoints, 0, 2, 110, -100, strokeBrush, fillBrush) : generator.GetLinearPath(bottomPoints, 0, 2, 110, -100, strokeBrush, fillBrush);
+            canvas.Children.Add(topPath);
+            canvas.Children.Add(bottomPath);
         }
 
 
