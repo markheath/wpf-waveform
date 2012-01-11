@@ -16,7 +16,7 @@ namespace WpfWaveform
             if (fileName.EndsWith(".ReaPeaks", StringComparison.CurrentCultureIgnoreCase))
             {
                 var reaPeaks = new ReaPeaksFileReader(fileName);
-                return reaPeaks.MipMaps[0];
+                return reaPeaks.MipMaps[1];
             }
 
             MipMap m = new MipMap();

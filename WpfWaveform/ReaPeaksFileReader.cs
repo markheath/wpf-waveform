@@ -34,8 +34,8 @@ namespace WpfWaveform
     class ReaPeaksFileReader
     {
         private string magicHeader;
-        private int channels;
-        private int sampleRate;
+        public int Channels { get; private set; }
+        public int SampleRate { get; private set; }
 
         public MipMap[] MipMaps { get; private set; }
 
@@ -50,9 +50,9 @@ namespace WpfWaveform
                 {
                     throw new InvalidOperationException("Not a valid ReaPeaks file");
                 }
-                this.channels = reader.ReadByte();
+                this.Channels = reader.ReadByte();
                 int mipMapCount = reader.ReadByte();
-                this.sampleRate = reader.ReadInt32();
+                this.SampleRate = reader.ReadInt32();
                 int sourceTimestamp = reader.ReadInt32();
                 int sourceFilesize = reader.ReadInt32();
                 for (int mipMap = 0; mipMap < mipMapCount; mipMap++)
@@ -80,15 +80,15 @@ namespace WpfWaveform
         {
             for (int n = 0; n < mipMap.Peaks.Length; n++)
             {
-                mipMap.Peaks[n] = new PeakValues(channels);
-                for (int ch = 0; ch < channels; ch++)
+                mipMap.Peaks[n] = new PeakValues(Channels);
+                for (int ch = 0; ch < Channels; ch++)
                 {
                     mipMap.Peaks[n].Channels[ch].Max = reader.ReadInt16();
                     if (magicHeader == "RPKN") // 1.1
                     {
                         mipMap.Peaks[n].Channels[ch].Min = reader.ReadInt16();
                     }
-                    else // 1.0
+                    else // 1.0, mirror the positive peak
                     {
                         mipMap.Peaks[n].Channels[ch].Min = (short)(0 - mipMap.Peaks[n].Channels[ch].Max);
                     }
