@@ -63,9 +63,27 @@ namespace WpfWaveform
             }
         }
 
+        public Path GetAsVerticalLines(IEnumerable<double> min, IEnumerable<double> max, double xOffset, double yOffset, double yMult, Brush stroke)
+        {
+            double xStep = 1.0; // force 1.0 for this
+            var minPoints = GetPoints(min, xOffset, xStep, yOffset, yMult).ToArray();
+            var maxPoints = GetPoints(max, xOffset, xStep, yOffset, yMult).ToArray();
+            List<PathFigure> lines = new List<PathFigure>(minPoints.Length);
+            for (int index = 0; index < minPoints.Length; index++)
+            {
+                var line = new LineSegment(maxPoints[index], true);
+                PathFigure figure = new PathFigure(minPoints[index], new PathSegment[] { line }, false);
+                lines.Add(figure);
+            }
+            
+            PathGeometry geometry = new PathGeometry(lines);
+            var path = new Path() { Stroke = stroke, StrokeThickness = 1, Data = geometry, SnapsToDevicePixels=true };
+            return path;
+        }
+
         public Path GetBezierPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
         {
-            var points = GetPoints(magnitude, 0, 2, 110, -100).ToArray();
+            var points = GetPoints(magnitude, xOffset, xStep, yOffset, yMult).ToArray();
             var geometry = GetBezierPathGeometry(points);
             var path = new Path() { Stroke = stroke, StrokeThickness = 1, Data = geometry, Fill = fill };
             return path;
@@ -73,7 +91,7 @@ namespace WpfWaveform
 
         public Path GetLinearPath(IEnumerable<double> magnitude, double xOffset, double xStep, double yOffset, double yMult, Brush stroke, Brush fill)
         {
-            var points = GetPoints(magnitude, 0, 2, 110, -100).ToArray();
+            var points = GetPoints(magnitude, xOffset, xStep, yOffset, yMult).ToArray();
             var geometry = GetLinearPathGeometry(points);
             var path = new Path() { Stroke = stroke, StrokeThickness = 1, Data = geometry, Fill = fill };
             return path;

@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:WpfWaveform"
         xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit"
         xmlns:toolkitx="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="345" Width="606">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -13,7 +13,9 @@
         <StackPanel Orientation="Horizontal" Margin="5">
             <Button Content="Load" Width="80" Click="Button_Click" />
             <CheckBox VerticalAlignment="Center" Margin="5,0" Content="Outline" Height="16" Name="checkBoxOutline" />
-            <CheckBox VerticalAlignment="Center" Margin="5,0" Content="Bezier" Height="16" Name="checkBoxBezier" />
+            <RadioButton VerticalAlignment="Center" Margin="5,0" Name="radioButtonBezier" Content="Bezier" />
+            <RadioButton VerticalAlignment="Center" Margin="5,0" Name="radioButtonLinear" Content="Linear" />
+            <RadioButton VerticalAlignment="Center" Margin="5,0" Name="radioButtonVertical" Content="Vertical" />
             <Label VerticalAlignment="Center">Fill:</Label>
             <toolkitx:ColorPicker Name="colorPickerFill" />
             <Label VerticalAlignment="Center">Outline:</Label>
