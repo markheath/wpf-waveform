@@ -18,6 +18,8 @@
             <RadioButton VerticalAlignment="Center" Margin="5,0" Name="radioButtonVertical" Content="Vertical" />
             <Label VerticalAlignment="Center">Fill:</Label>
             <toolkitx:ColorPicker Name="colorPickerFill" />
+            <Label VerticalAlignment="Center">Bottom:</Label>
+            <toolkitx:ColorPicker Name="colorPickerBottom" />
             <Label VerticalAlignment="Center">Outline:</Label>
             <toolkitx:ColorPicker Name="colorPickerOutline" />
         </StackPanel>

@@ -25,7 +25,8 @@ namespace WpfWaveform
         {
             InitializeComponent();
             this.radioButtonBezier.IsChecked = true;
-            this.colorPickerFill.SelectedColor = Colors.LightGray;
+            this.colorPickerFill.SelectedColor = Colors.Gray;
+            this.colorPickerBottom.SelectedColor = Colors.LightGray;
             this.colorPickerOutline.SelectedColor = Colors.SlateGray;
 
             this.colorPickerFill.SelectedColorChanged += OnDrawingPropertyChanged;
@@ -52,7 +53,8 @@ namespace WpfWaveform
             if (result.HasValue && result.Value)
             {
                 var generator = new WaveFormPointsGenerator();
-                this.mipMap = generator.GetPeaks(ofd.FileName, 4100);
+                // 4100 = 10 points per second
+                this.mipMap = generator.GetPeaks(ofd.FileName, 22050);
                 GenerateWaveform();
             }
         }
@@ -64,20 +66,26 @@ namespace WpfWaveform
             var generator = new WaveFormPointsGenerator();
             Brush strokeBrush = new SolidColorBrush(colorPickerOutline.SelectedColor);
             Brush fillBrush = new SolidColorBrush(colorPickerFill.SelectedColor);
+            Brush bottomBrush = new SolidColorBrush(colorPickerBottom.SelectedColor);
             canvas.Children.Clear();
             var topPoints = mipMap.Peaks.Select(p => p.Channels[0].Max / 32768.0);
             var bottomPoints = mipMap.Peaks.Select(p => p.Channels[0].Min / 32768.0);
 
             if (radioButtonVertical.IsChecked.Value)
             {
-                var path = generator.GetAsVerticalLines(topPoints, bottomPoints, 0, 110, -100, strokeBrush);
+                double xOffset = 0.5;
+                var path = generator.GetAsVerticalLines(topPoints, bottomPoints, xOffset, 110, -100, strokeBrush);
                 canvas.Children.Add(path);
             }
             else
             {
                 if (!checkBoxOutline.IsChecked.Value) strokeBrush = null;
-                var topPath = radioButtonBezier.IsChecked.Value ? generator.GetBezierPath(topPoints, 0, 2, 110, -100, strokeBrush, fillBrush) : generator.GetLinearPath(topPoints, 0, 2, 110, -100, strokeBrush, fillBrush);
-                var bottomPath = radioButtonBezier.IsChecked.Value ? generator.GetBezierPath(bottomPoints, 0, 2, 110, -100, strokeBrush, fillBrush) : generator.GetLinearPath(bottomPoints, 0, 2, 110, -100, strokeBrush, fillBrush);
+                double xStep = 1; // was 2
+                double yMultTop = -100;
+                double yMultBottom = -25;
+                
+                var topPath = radioButtonBezier.IsChecked.Value ? generator.GetBezierPath(topPoints, 0, xStep, 110, yMultTop, strokeBrush, fillBrush) : generator.GetLinearPath(topPoints, 0, xStep, 110, yMultTop, strokeBrush, fillBrush);
+                var bottomPath = radioButtonBezier.IsChecked.Value ? generator.GetBezierPath(bottomPoints, 0, xStep, 110, yMultBottom, strokeBrush, bottomBrush) : generator.GetLinearPath(bottomPoints, 0, xStep, 110, yMultBottom, strokeBrush, bottomBrush);
                 canvas.Children.Add(topPath);
                 canvas.Children.Add(bottomPath);
             }
